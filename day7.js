@@ -6,7 +6,7 @@ const removeNewlines = (str) => str.replace(/\n/g, '')
 const splitByNewline = (str) => str.split('\n')
 const splitByString = (str) => (str2) => str2.split(str)
 
-const LOG = false
+const LOG = true
 const log = LOG ? console.log : () => {}
 
 const graph = fs
@@ -21,7 +21,7 @@ const graph = fs
         const regex = /(\d)((\s\w+){2})\s/gm
         const [, quantity, color] = regex.exec(containee)
 
-        allContaineeData[color.trim()] = quantity
+        allContaineeData[color.trim()] = +quantity
         return allContaineeData
       }, {})
     }
@@ -32,8 +32,31 @@ const graph = fs
 
 log('graph: ', graph)
 
-searchForShinyGold(graph)
+const count = countBags('shiny gold')
+console.log('count: ', count)
 
+function countBags(color) {
+  log('color: ', color)
+
+  //sum all children counts multiplied by countBags(newColor)
+  const children = graph[color]
+  log('children: ', children)
+
+  const num = Object.entries(children).reduce((sum, [childColor, childCount]) => {
+    log('childColor: ', childColor)
+    log('childCount: ', childCount)
+    console.log('\n')
+    const deeperNum = childCount * (countBags(childColor) || 1)
+    log('deeperNum: ', deeperNum)
+    sum += deeperNum
+    return sum
+  }, 0)
+
+  log(`${color} calculated to hold ${num} bags`)
+  return num + 1
+}
+
+// searchForShinyGold(graph)
 function searchForShinyGold(graph) {
   const colorEntries = Object.entries(graph)
   const visitedColors = []
