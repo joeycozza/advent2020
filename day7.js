@@ -6,9 +6,6 @@ const removeNewlines = (str) => str.replace(/\n/g, '')
 const splitByNewline = (str) => str.split('\n')
 const splitByString = (str) => (str2) => str2.split(str)
 
-const LOG = true
-const log = LOG ? console.log : () => {}
-
 const graph = fs
   .readFileSync('./input/day7.txt', 'utf8')
   .split('\n')
@@ -30,31 +27,22 @@ const graph = fs
     return graph
   }, {})
 
-log('graph: ', graph)
-
 const count = countBags('shiny gold')
 console.log('count: ', count)
 
 function countBags(color) {
-  log('color: ', color)
-
-  //sum all children counts multiplied by countBags(newColor)
   const children = graph[color]
-  log('children: ', children)
 
-  const num = Object.entries(children).reduce((sum, [childColor, childCount]) => {
-    log('childColor: ', childColor)
-    log('childCount: ', childCount)
-    console.log('\n')
-    const deeperNum = childCount * (countBags(childColor) || 1)
-    log('deeperNum: ', deeperNum)
-    sum += deeperNum
+  const allChildrenCount = Object.entries(children).reduce((sum, [childColor, childCount]) => {
+    const deeperCount = childCount * (countBags(childColor) || 1)
+    sum += deeperCount
     return sum
   }, 0)
 
-  log(`${color} calculated to hold ${num} bags`)
-  return num + 1
+  console.log(`${color} calculated to hold ${allChildrenCount} bags`)
+  return allChildrenCount + 1
 }
+
 
 // searchForShinyGold(graph)
 function searchForShinyGold(graph) {
@@ -63,40 +51,31 @@ function searchForShinyGold(graph) {
   const goodBags = []
 
   colorEntries.forEach(([color, node]) => {
-    log('starting color, node: ', color, node)
     visitNode(color, node)
   })
 
   function visitNode(color, childNode, currentLine = []) {
-    log('\n')
-    log('color: ', color)
-    log('visitedColors: ', visitedColors)
-    log('visitedColors.includes(color): ', visitedColors.includes(color))
     if (color === 'shiny gold') {
-      log('found gold and returning!')
       goodBags.push(...currentLine)
       return
     }
+
     if (visitedColors.includes(color)) {
-      log('returning early')
       if (goodBags.includes(color)) {
-        log('current color of current line already visited and in good bag, so adding curline to goodBags')
+        // already visited this color and added to goodBags, but need to add the currentLine
+        // to goodBags in case one of ancestors is new
         goodBags.push(...currentLine)
       }
       return
     }
+
     visitedColors.push(color)
     currentLine.push(color)
-    log('childNode: ', childNode)
-    log('currentLine: ', currentLine)
-    log('goodBags: ', goodBags)
 
-    log('childNode: ', childNode)
     Object.entries(childNode).forEach(([childColor, quantity]) => {
-      log('childColor, childNode: ', childColor, graph[childColor])
-      log('about to call visitNode')
       visitNode(childColor, graph[childColor], currentLine)
     })
+
     currentLine.pop()
   }
 
