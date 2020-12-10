@@ -1,10 +1,13 @@
 const fs = require('fs')
 
 const requiredFields = {
-  byr: (str) => str.length === 4 && +str >= 1920 && +str <= 2002,
-  iyr: (str) => str.length === 4 && +str >= 2010 && +str <= 2020,
-  eyr: (str) => str.length === 4 && +str >= 2020 && +str <= 2030,
+  byr: (str) => str && str.length === 4 && +str >= 1920 && +str <= 2002,
+  iyr: (str) => str && str.length === 4 && +str >= 2010 && +str <= 2020,
+  eyr: (str) => str && str.length === 4 && +str >= 2020 && +str <= 2030,
   hgt: (str) => {
+    if (!str) {
+      return false
+    }
     const isCm = str.endsWith('cm')
     const isIn = str.endsWith('in')
     const validUnit = isCm || isIn
@@ -19,9 +22,9 @@ const requiredFields = {
       return value >= 59 && value <= 76
     }
   },
-  hcl: (str) => /#[0-9a-f]{6}/.test(str),
-  ecl: (str) => ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'].includes(str),
-  pid: (str) => /^\d{9}$/.test(str),
+  hcl: (str) => str && /#[0-9a-f]{6}/.test(str),
+  ecl: (str) => str && ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'].includes(str),
+  pid: (str) => str && /^\d{9}$/.test(str),
 }
 
 const validPassports = fs
@@ -37,10 +40,7 @@ const validPassports = fs
         return obj
       }, {})
   )
-  .filter((passport) => {
-    return Object.entries(requiredFields).every(([field, validator]) => !!passport[field] && validator(passport[field]))
-    // return Object.entries(requiredFields).every(([field, validator]) => !!passport[field])
-  })
+  .filter((passport) => Object.entries(requiredFields).every(([field, validator]) => validator(passport[field])))
 
 console.log('passports.length: ', validPassports.length)
-console.log('validPassports: ', validPassports)
+// console.log('validPassports: ', validPassports)

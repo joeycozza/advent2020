@@ -8,22 +8,20 @@ const grid = fs
 
 const rowLength = grid.length
 const colLength = grid[0].length
-console.log('rowLength: ', rowLength)
-console.log('colLength: ', colLength)
-
 const count = countTrees(3, 1)
-console.log('count: ', count)
 
+console.log('count: ', count)
 console.log(countTrees(1, 1) * countTrees(3, 1) * countTrees(5, 1) * countTrees(7, 1) * countTrees(1, 2))
 
 function countTrees(deltaX, deltaY) {
   let curX = 0
 
   const count = grid.reduce((sum, curRow, index) => {
-    //if we're skipping multiple rows
+    // skipping multiple rows or skipping the very first row
     if (index % deltaY !== 0 || index === 0) {
       return sum
     }
+
     curX = (curX + deltaX) % colLength
     const hitTree = curRow[curX] === '#'
 

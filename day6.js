@@ -3,11 +3,10 @@ const fs = require('fs')
 
 const length = (str) => str.length
 const removeNewlines = (str) => str.replace(/\n/g, '')
-const splitByPerson = (str) => str.split('\n')
+const splitByString = (splitter) => (str) => str.split(splitter)
+const intersectionSpread = (arr) => _.intersection(...arr)
 
-const groups = fs
-  .readFileSync('./input/day6.txt', 'utf8')
-  .split('\n\n')
+const groups = fs.readFileSync('./input/day6.txt', 'utf8').split('\n\n')
 
 const groupCounts = groups
   .map(removeNewlines)
@@ -15,11 +14,9 @@ const groupCounts = groups
   .map(length)
 
 const allYes = groups
-  .map(splitByPerson)
-  .map((group) => {
-    const answerArrays = group.filter(Boolean).map((person) => person.split(''))
-    return _.intersection(...answerArrays)
-  })
+  .map(splitByString('\n'))
+  .map((group) => group.filter(Boolean).map(splitByString('')))
+  .map(intersectionSpread)
   .map(length)
 
 console.log('Anyone said yes count: ', _.sum(groupCounts))
