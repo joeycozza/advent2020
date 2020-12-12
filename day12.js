@@ -3,8 +3,8 @@ const fs = require('fs')
 
 const headings = ['north', 'east', 'south', 'west']
 let curHeading = 'east'
-let nsPos = 0
-let ewPos = 0
+let waypoint = { ns: 0, ew: 0 }
+let location = { ns: 0, ew: 0 }
 
 const differences = fs
   .readFileSync('./input/day12.txt', 'utf8')
@@ -18,48 +18,45 @@ const differences = fs
     switch (command) {
       case 'N':
         // console.log('Moved North')
-        nsPos += value
+        location.ns += value
         break
       case 'S':
         // console.log('Moved South')
-        nsPos -= value
+        location.ns -= value
         break
       case 'E':
         // console.log('Moved East')
-        ewPos += value
+        location.ew += value
         break
       case 'W':
         // console.log('Moved West')
-        ewPos -= value
+        location.ew -= value
         break
       case 'L':
-        // console.log('Turning Left')
         headingsToMove = value / 90
         curIndex = headings.findIndex((heading) => heading === curHeading)
         newIndex = (curIndex - headingsToMove + 4) % 4
         curHeading = headings[newIndex]
         break
       case 'R':
-        // console.log('Turning Right')
         headingsToMove = value / 90
         curIndex = headings.findIndex((heading) => heading === curHeading)
         newIndex = (curIndex + headingsToMove) % 4
         curHeading = headings[newIndex]
         break
       case 'F':
-        // console.log('Moving Forward')
         switch (curHeading) {
           case 'east':
-            ewPos += value
+            location.ew += value
             break
           case 'west':
-            ewPos -= value
+            location.ew -= value
             break
           case 'north':
-            nsPos += value
+            location.ns += value
             break
           case 'south':
-            nsPos -= value
+            location.ns -= value
             break
           default:
             console.log('Default Case')
@@ -68,11 +65,10 @@ const differences = fs
       default:
         console.log('Default Case')
     }
-    // console.log('nsPos: ', nsPos)
-    // console.log('ewPos: ', ewPos)
+    // console.log('ns: ', ns)
+    // console.log('ew: ', ew)
     // console.log('\n')
   })
 
-
 console.log('The End')
-console.log(Math.abs(nsPos) + Math.abs(ewPos))
+console.log(Math.abs(location.ns) + Math.abs(location.ew))
