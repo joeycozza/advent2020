@@ -3,7 +3,7 @@ const fs = require('fs')
 
 const headings = ['north', 'east', 'south', 'west']
 let curHeading = 'east'
-let waypoint = { ns: 0, ew: 0 }
+let waypoint = { ns: 1, ew: 10 }
 let location = { ns: 0, ew: 0 }
 
 const differences = fs
@@ -17,50 +17,43 @@ const differences = fs
     let newIndex
     switch (command) {
       case 'N':
-        location.ns += value
+        waypoint.ns += value
         break
       case 'S':
-        location.ns -= value
+        waypoint.ns -= value
         break
       case 'E':
-        location.ew += value
+        waypoint.ew += value
         break
       case 'W':
-        location.ew -= value
+        waypoint.ew -= value
         break
       case 'L':
-        headingsToMove = value / 90
-        curIndex = headings.findIndex((heading) => heading === curHeading)
-        newIndex = (curIndex - headingsToMove + 4) % 4
-        curHeading = headings[newIndex]
+        rotationsToDo = value / 90
+        for (let i = 0; i < rotationsToDo; i++) {
+          temp = waypoint.ew
+          waypoint.ew = -waypoint.ns
+          waypoint.ns = temp
+        }
         break
       case 'R':
-        headingsToMove = value / 90
-        curIndex = headings.findIndex((heading) => heading === curHeading)
-        newIndex = (curIndex + headingsToMove) % 4
-        curHeading = headings[newIndex]
+        rotationsToDo = value / 90
+        for (let i = 0; i < rotationsToDo; i++) {
+          temp = waypoint.ew
+          waypoint.ew = waypoint.ns
+          waypoint.ns = -temp
+        }
         break
       case 'F':
-        switch (curHeading) {
-          case 'east':
-            location.ew += value
-            break
-          case 'west':
-            location.ew -= value
-            break
-          case 'north':
-            location.ns += value
-            break
-          case 'south':
-            location.ns -= value
-            break
-          default:
-            console.log('Default Case')
-        }
+        location.ew += value * waypoint.ew
+        location.ns += value * waypoint.ns
         break
       default:
         console.log('Default Case')
     }
+    console.log('location: ', location)
+    console.log('waypoint: ', waypoint)
+    console.log('')
   })
 
 console.log(Math.abs(location.ns) + Math.abs(location.ew))
