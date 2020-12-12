@@ -39,7 +39,7 @@ function doSinglePass(seats) {
     // but shouldn't matter for algorithm
     if (adjacentCount === 0) {
       newSeats[index] = '#'
-    } else if (adjacentCount >= 4) {
+    } else if (adjacentCount >= 5) {
       newSeats[index] = 'L'
     }
   })
@@ -51,24 +51,33 @@ function getAdjacentCount(seats, index, log = () => {}) {
   const locations = findLocationInfo(index)
 
   const positionData = [
-    { position: index - rowLength - 1, exclude: ['top', 'left'] },
-    { position: index - rowLength, exclude: ['top'] },
-    { position: index - rowLength + 1, exclude: ['top', 'right'] },
-    { position: index - 1, exclude: ['left'] },
-    { position: index + 1, exclude: ['right'] },
-    { position: index + rowLength - 1, exclude: ['bottom', 'left'] },
-    { position: index + rowLength, exclude: ['bottom'] },
-    { position: index + rowLength + 1, exclude: ['bottom', 'right'] },
+    { positionMath: -rowLength - 1, exclude: ['top', 'left'] },
+    { positionMath: -rowLength, exclude: ['top'] },
+    { positionMath: -rowLength + 1, exclude: ['top', 'right'] },
+    { positionMath: -1, exclude: ['left'] },
+    { positionMath: 1, exclude: ['right'] },
+    { positionMath: rowLength - 1, exclude: ['bottom', 'left'] },
+    { positionMath: rowLength, exclude: ['bottom'] },
+    { positionMath: rowLength + 1, exclude: ['bottom', 'right'] },
   ]
 
-  const filteredPositionsData = positionData.filter(({ position, exclude }) => {
+  const filteredPositionsData = positionData.filter(({ exclude }) => {
     return !exclude.some((exclusion) => locations.includes(exclusion))
   })
 
-  log(filteredPositionsData)
+  return filteredPositionsData.reduce((sum, { positionMath, exclude }) => {
+    let newIndex = index + positionMath
+    let char = seats[newIndex]
 
-  return filteredPositionsData.reduce((sum, { position }) => {
-    return seats[position] === '#' ? sum + 1 : sum
+    while (char === '.'){
+      newIndex += positionMath
+      char = seats[newIndex]
+      if (findLocationInfo(newIndex).length > 0) {
+        break
+      }
+    }
+
+    return char === '#' ? sum + 1 : sum
   }, 0)
 }
 
