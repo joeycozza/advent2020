@@ -17,19 +17,15 @@ const differences = fs
     let newIndex
     switch (command) {
       case 'N':
-        // console.log('Moved North')
         location.ns += value
         break
       case 'S':
-        // console.log('Moved South')
         location.ns -= value
         break
       case 'E':
-        // console.log('Moved East')
         location.ew += value
         break
       case 'W':
-        // console.log('Moved West')
         location.ew -= value
         break
       case 'L':
@@ -65,10 +61,6 @@ const differences = fs
       default:
         console.log('Default Case')
     }
-    // console.log('ns: ', ns)
-    // console.log('ew: ', ew)
-    // console.log('\n')
   })
 
-console.log('The End')
 console.log(Math.abs(location.ns) + Math.abs(location.ew))
