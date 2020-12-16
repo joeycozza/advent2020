@@ -1,25 +1,37 @@
 const _ = require('lodash')
 const fs = require('fs')
 
+const numberLastSeen = {}
+
 let numbers = fs
   .readFileSync('./input/day15.txt', 'utf8')
   .slice(0, -1)
   .split(',')
   .map(Number)
 
-console.log('numbers: ', numbers)
+prePopulateLastSeenMap(numbers)
 
-saySequence(numbers, 2020)
+saySequence(0, 30000000)
 
-function saySequence(numList, count) {
-  while (numList.length < count) {
-    // numList.length - 2 because we want to find the second to last time, not the last time it was said
-    const prevTimeSaid = numList.lastIndexOf(_.last(numList), numList.length - 2)
+function saySequence(lastNum, count) {
+  for (let i = numbers.length; i < count - 1; i++) {
+    if(!numberLastSeen[lastNum]) {
+      numberLastSeen[lastNum] = {}
+      numberLastSeen[lastNum].penultimateSeenIndex = 0
+      numberLastSeen[lastNum].lastSeenIndex = i
+      lastNum = 0
+    } else {
+      numberLastSeen[lastNum].penultimateSeenIndex = numberLastSeen[lastNum].lastSeenIndex
+      numberLastSeen[lastNum].lastSeenIndex = i
+      lastNum = numberLastSeen[lastNum].lastSeenIndex - numberLastSeen[lastNum].penultimateSeenIndex
+    }
 
-    const newNum = prevTimeSaid === -1 ? 0 : numList.length - 1 - prevTimeSaid
-
-    numList.push(newNum)
   }
+  console.log('lastNum: ', lastNum)
+}
 
-  console.log('Last Number: ', _.last(numList))
+function prePopulateLastSeenMap(numbers) {
+  numbers.forEach((num, index) => {
+    numberLastSeen[num] = { lastSeenIndex: index, penultimateSeenIndex: 0 }
+  })
 }
